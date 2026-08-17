@@ -1,0 +1,5 @@
+case_id,module,platform,priority,precondition,steps,expected
+ENT-TC-201,订单服务,Linux,P1,支付服务超时,并发请求订单详情,事务及时结束且连接池可用连接恢复
+ENT-TC-202,订单服务,Linux,P1,数据库慢查询,连续请求订单详情,系统返回可控错误且记录request_id
+ENT-TC-203,网关,Linux,P2,新旧配置混合,轮询多个网关节点,路由版本一致且新接口均可访问
+

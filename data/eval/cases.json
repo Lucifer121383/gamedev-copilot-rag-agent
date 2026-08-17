@@ -1,0 +1,59 @@
+[
+  {
+    "domain": "game",
+    "question": "Android 1.3切换装备闪退 E-EQP-500",
+    "expected_source": "bug_tickets/history.json",
+    "expected_category": "客户端崩溃",
+    "expected_severity": "P1"
+  },
+  {
+    "domain": "game",
+    "question": "装备异步加载完成前为什么不能替换模型",
+    "expected_source": "design_docs/equipment_system.md",
+    "expected_category": "研发知识咨询",
+    "expected_severity": "P3"
+  },
+  {
+    "domain": "game",
+    "question": "MATCH-408后匹配按钮不能再次点击",
+    "expected_source": "bug_tickets/history.json",
+    "expected_category": "一般缺陷",
+    "expected_severity": "P2"
+  },
+  {
+    "domain": "game",
+    "question": "1.3版本装备系统修改了哪些内容和风险",
+    "expected_source": "patch_notes/version_1_3.md",
+    "expected_category": "研发知识咨询",
+    "expected_severity": "P3"
+  },
+  {
+    "domain": "enterprise",
+    "question": "2.4订单接口500并出现DB-POOL-503",
+    "expected_source": "error_logs/order_database.log",
+    "expected_category": "服务故障",
+    "expected_severity": "P1"
+  },
+  {
+    "domain": "enterprise",
+    "question": "数据库连接池耗尽的历史事故",
+    "expected_source": "incident_tickets/history.json",
+    "expected_category": "服务故障",
+    "expected_severity": "P1"
+  },
+  {
+    "domain": "enterprise",
+    "question": "2.4版本订单服务有哪些发布风险",
+    "expected_source": "release_notes/version_2_4.md",
+    "expected_category": "研发知识咨询",
+    "expected_severity": "P3"
+  },
+  {
+    "domain": "enterprise",
+    "question": "GW-404导致部分订单请求失败",
+    "expected_source": "incident_tickets/history.json",
+    "expected_category": "一般缺陷",
+    "expected_severity": "P2"
+  }
+]
+

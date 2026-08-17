@@ -1,0 +1,6 @@
+2026-07-22T09:31:04Z level=ERROR platform=Linux version=2.4 module=order_service
+error_code=DB-POOL-503 endpoint=/api/orders/88421
+message="timeout acquiring database connection after 3000ms"
+pool_active=50 pool_idle=0 pool_max=50 payment_timeout=true
+trace="OrderService.getDetail -> PaymentClient.getStatus -> Database.acquire"
+

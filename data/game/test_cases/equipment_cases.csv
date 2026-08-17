@@ -1,0 +1,6 @@
+case_id,module,platform,priority,precondition,steps,expected
+GAME-TC-101,装备系统,Android,P1,2GB内存设备,连续切换五件高品质装备,客户端不崩溃且只展示最后一次选择
+GAME-TC-102,装备系统,Android,P1,弱网环境,切换装备并立即退出背包,过期回调被忽略且不访问空资源
+GAME-TC-103,装备系统,iOS,P2,正常网络,重复点击同一装备确认按钮,只提交一次装备变更请求
+GAME-TC-104,匹配系统,Android,P2,模拟超时,等待MATCH-408后再次点击匹配,按钮恢复且可重新匹配
+

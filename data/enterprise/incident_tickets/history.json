@@ -1,0 +1,31 @@
+[
+  {
+    "bug_id": "INC-2026-014",
+    "title": "2.3版本订单详情接口导致数据库连接池耗尽",
+    "version": "2.3",
+    "platform": "Linux",
+    "module": "订单服务",
+    "severity": "P1",
+    "error_code": "DB-POOL-503",
+    "symptom": "发布后订单详情接口连续返回500，连接池使用率达到100%",
+    "root_cause": "支付服务超时异常路径没有及时结束事务并释放连接",
+    "resolution": "把外部支付查询移出数据库事务并在finally中释放连接",
+    "reproduction_steps": ["模拟支付服务超时", "并发请求订单详情", "观察连接池使用率"],
+    "regression_tests": ["支付超时", "连接释放", "高并发订单详情", "事务边界"]
+  },
+  {
+    "bug_id": "INC-2026-019",
+    "title": "网关缓存旧路由导致部分订单请求404",
+    "version": "2.4",
+    "platform": "Linux",
+    "module": "网关",
+    "severity": "P2",
+    "error_code": "GW-404",
+    "symptom": "灰度节点可以访问新接口，旧节点返回404",
+    "root_cause": "部分网关节点没有刷新路由缓存",
+    "resolution": "完善配置版本检查并增加缓存刷新健康探针",
+    "reproduction_steps": ["部署新路由", "保留旧网关缓存", "轮询多个节点"],
+    "regression_tests": ["灰度路由", "缓存刷新", "节点版本一致性"]
+  }
+]
+

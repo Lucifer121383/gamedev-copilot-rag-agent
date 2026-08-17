@@ -1,0 +1,13 @@
+services:
+  gamedev-copilot:
+    build: .
+    ports:
+      - "8010:8010"
+    environment:
+      EMBEDDING_BACKEND: hybrid_tfidf
+      RAG_STORAGE_DIR: /app/runtime-storage
+    volumes:
+      - gamedev-copilot-storage:/app/runtime-storage
+
+volumes:
+  gamedev-copilot-storage:

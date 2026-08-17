@@ -1,0 +1,45 @@
+[
+  {
+    "bug_id": "GAME-BUG-037",
+    "title": "Android连续切换高品质装备时客户端闪退",
+    "version": "1.2",
+    "platform": "Android",
+    "module": "装备系统",
+    "severity": "P1",
+    "error_code": "E-EQP-500",
+    "symptom": "在2GB内存设备连续切换五件带特效装备时出现NullReferenceException",
+    "root_cause": "旧资源释放后，异步回调仍使用已失效的模型资源句柄",
+    "resolution": "回调执行前校验资源句柄、页面生命周期和请求编号",
+    "reproduction_steps": ["进入背包", "连续切换五件高品质装备", "加载中返回角色页面", "再次进入背包"],
+    "regression_tests": ["低内存设备快速切换", "页面退出后回调", "弱网资源加载", "重复点击节流"]
+  },
+  {
+    "bug_id": "GAME-BUG-052",
+    "title": "跨区匹配超时后按钮无法再次点击",
+    "version": "1.3",
+    "platform": "Android",
+    "module": "匹配系统",
+    "severity": "P2",
+    "error_code": "MATCH-408",
+    "symptom": "匹配超过15秒后显示超时，但按钮一直保持禁用",
+    "root_cause": "超时分支没有恢复按钮状态",
+    "resolution": "在超时和取消分支统一重置匹配状态机",
+    "reproduction_steps": ["进入跨区匹配", "模拟服务超时", "等待错误提示", "再次点击匹配"],
+    "regression_tests": ["匹配超时", "主动取消", "断网恢复"]
+  },
+  {
+    "bug_id": "GAME-BUG-061",
+    "title": "iOS第三方登录回调丢失",
+    "version": "1.3",
+    "platform": "iOS",
+    "module": "登录系统",
+    "severity": "P2",
+    "error_code": "AUTH-302",
+    "symptom": "从第三方应用返回游戏后停留在登录等待页面",
+    "root_cause": "应用恢复事件早于登录页面监听器注册",
+    "resolution": "在全局生命周期模块缓存回调并由登录页面消费",
+    "reproduction_steps": ["选择第三方登录", "切换到授权应用", "完成授权", "返回游戏"],
+    "regression_tests": ["冷启动登录", "后台恢复", "取消授权"]
+  }
+]
+
