@@ -10,3 +10,11 @@ storage/*
 !storage/.gitkeep
 .smoke_storage/
 .eval_storage/
+.semantic_cache/
+.semantic_storage/
+frontend/node_modules/
+frontend/.vite/
+storage/*.json
+storage/*.npy
+storage/*.index
+storage/*.db

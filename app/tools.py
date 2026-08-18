@@ -147,7 +147,7 @@ class ToolRegistry:
                 "ok": True,
                 "data": data,
             }
-        except (ValueError, RuntimeError) as exc:
+        except Exception as exc:
             return {
                 "call_id": validated.call_id,
                 "tool": validated.name,
@@ -217,4 +217,3 @@ def create_registry(tools: DevelopmentTools) -> ToolRegistry:
     registry.register("generate_test_cases", tools.generate_test_cases)
     registry.register("create_bug_ticket", tools.create_bug_ticket)
     return registry
-

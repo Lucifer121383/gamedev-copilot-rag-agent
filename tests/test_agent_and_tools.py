@@ -74,11 +74,33 @@ def test_same_explicit_request_creates_one_ticket(
         "domain": "game",
         "session_id": "idempotent-session",
     }
-    first = service.diagnose(**kwargs)
-    second = service.diagnose(**kwargs)
+    first_pending = service.diagnose(**kwargs)
+    assert first_pending["status"] == "awaiting_approval"
+    first = service.approve(first_pending["request_id"], approved=True)
+    second_pending = service.diagnose(**kwargs)
+    second = service.approve(second_pending["request_id"], approved=True)
     assert first["ticket"]["ticket_no"] == second["ticket"]["ticket_no"]
     assert first["ticket"]["cached"] is False
     assert second["ticket"]["cached"] is True
+    assert service.store.ticket_stats("game")["total"] == 1
+
+
+def test_idempotency_key_cannot_leak_ticket_across_sessions(
+    service: GameDevCopilotService,
+) -> None:
+    common = {
+        "idempotency_key": "manually-shared-key",
+        "domain": "game",
+        "category": "一般缺陷",
+        "severity": "P2",
+        "platform": "Android",
+        "module": "装备系统",
+        "title": "测试工单",
+        "description": "用于验证幂等键作用域",
+    }
+    service.store.create_ticket(session_id="scope-session-a", **common)
+    with pytest.raises(ValueError, match="其他会话"):
+        service.store.create_ticket(session_id="scope-session-b", **common)
     assert service.store.ticket_stats("game")["total"] == 1
 
 
@@ -89,3 +111,22 @@ def test_session_cannot_cross_workspace(service: GameDevCopilotService) -> None:
             message="订单服务规则是什么", domain="enterprise", session_id="shared"
         )
 
+
+@pytest.mark.parametrize(
+    ("message", "domain", "category", "severity"),
+    [
+        ("游戏客户端崩溃的标准排查步骤是什么", "game", "研发知识咨询", "P3"),
+        ("1.3版本MATCH-408代表什么", "game", "研发知识咨询", "P3"),
+        ("iOS第三方登录AUTH-302回调丢失怎么修复", "game", "功能故障", "P2"),
+        ("太空战舰模块出现ERR-SPACE-999怎么修复", "game", "一般缺陷", "P2"),
+        ("DB-POOL-503表示什么，有哪些常见原因", "enterprise", "服务故障", "P1"),
+        ("慢SQL和事务未提交会造成什么连接池问题", "enterprise", "性能问题", "P2"),
+        ("发现连接池错误时为什么要先做只读健康检查", "enterprise", "研发知识咨询", "P3"),
+    ],
+)
+def test_rule_fallback_distinguishes_knowledge_from_incident(
+    message: str, domain: str, category: str, severity: str
+) -> None:
+    diagnosis = BugDiagnosisAgent().diagnose(message, domain, [])
+    assert diagnosis.category == category
+    assert diagnosis.severity == severity

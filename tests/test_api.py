@@ -1,4 +1,5 @@
 import os
+import re
 import tempfile
 
 os.environ.setdefault("RAG_STORAGE_DIR", tempfile.mkdtemp(prefix="gamedev-api-test-"))
@@ -7,6 +8,18 @@ from fastapi.testclient import TestClient
 
 from app import main as main_module
 from app.service import GameDevCopilotService
+
+
+def test_built_react_page_and_asset_are_served() -> None:
+    with TestClient(main_module.app) as client:
+        page = client.get("/")
+        assert page.status_code == 200
+        assert 'id="root"' in page.text
+        match = re.search(r'src="(/static/assets/[^"]+\.js)"', page.text)
+        assert match is not None
+        asset = client.get(match.group(1))
+        assert asset.status_code == 200
+        assert "javascript" in asset.headers["content-type"]
 
 
 def test_health_search_and_diagnose(
@@ -58,4 +71,3 @@ def test_bad_workspace_and_bad_session_are_rejected(
         )
         assert bad_domain.status_code == 422
         assert bad_session.status_code == 422
-

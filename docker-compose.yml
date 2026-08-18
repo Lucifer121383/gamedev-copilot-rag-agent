@@ -1,13 +1,37 @@
 services:
-  gamedev-copilot:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: incident_copilot
+      POSTGRES_USER: incident
+      POSTGRES_PASSWORD: incident-local-password
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U incident -d incident_copilot"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - incident-postgres:/var/lib/postgresql/data
+
+  incident-copilot:
     build: .
     ports:
       - "8010:8010"
     environment:
-      EMBEDDING_BACKEND: hybrid_tfidf
+      EMBEDDING_BACKEND: hashing
+      VECTOR_BACKEND: faiss
+      RERANKER_BACKEND: lightweight
+      DATABASE_URL: postgresql+psycopg://incident:incident-local-password@postgres:5432/incident_copilot
       RAG_STORAGE_DIR: /app/runtime-storage
+      API_AUTH_ENABLED: "false"
+      LOG_LEVEL: INFO
+      JSON_LOGS: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
     volumes:
-      - gamedev-copilot-storage:/app/runtime-storage
+      - incident-index-storage:/app/runtime-storage
 
 volumes:
-  gamedev-copilot-storage:
+  incident-postgres:
+  incident-index-storage:

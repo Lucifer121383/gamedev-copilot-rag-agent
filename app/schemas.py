@@ -11,7 +11,7 @@ Domain = Literal["game", "enterprise"]
 class SearchRequest(BaseModel):
     query: str = Field(min_length=2, max_length=2000)
     domain: Domain
-    top_k: int = Field(default=5, ge=1, le=10)
+    top_k: int = Field(default=5, ge=1, le=20)
     filters: dict[str, str] | None = None
 
 
@@ -31,6 +31,12 @@ class DiagnoseRequest(BaseModel):
         max_length=100,
         pattern=r"^[a-zA-Z0-9_.:-]+$",
     )
+    approve_write: bool = False
+
+
+class ApprovalRequest(BaseModel):
+    approved: bool
+    reason: str | None = Field(default=None, max_length=500)
 
 
 class SourceItem(BaseModel):
@@ -60,6 +66,13 @@ class DiagnosisItem(BaseModel):
     needs_human_review: bool
 
 
+class EvidenceItem(BaseModel):
+    sufficient: bool
+    confidence: float
+    reason: str
+    source_count: int
+
+
 class TraceItem(BaseModel):
     step: int
     node: str
@@ -70,7 +83,12 @@ class TraceItem(BaseModel):
 class RequestMetrics(BaseModel):
     retrieval_ms: float
     generation_ms: float
-    total_ms: float
+    active_ms: float
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+    llm_retries: int
+    citation_valid: bool
 
 
 class TicketItem(BaseModel):
@@ -95,14 +113,20 @@ class DiagnoseResponse(BaseModel):
     session_id: str
     domain: Domain
     message: str
+    status: Literal["completed", "awaiting_approval"]
     answer: str
     mode: str
     warning: str | None = None
-    action: Literal["answer", "human_review", "create_ticket"]
+    action: Literal[
+        "answer", "human_review", "awaiting_approval", "create_ticket", "write_rejected"
+    ]
     diagnosis: DiagnosisItem
+    evidence: EvidenceItem
     sources: list[SourceItem]
     tool_results: list[dict[str, Any]]
     ticket: TicketItem | None = None
+    approval: dict[str, Any] | None = None
+    planner_mode: str
     trace: list[TraceItem]
     metrics: RequestMetrics
 
@@ -110,3 +134,13 @@ class DiagnoseResponse(BaseModel):
 class TicketStatusUpdate(BaseModel):
     status: Literal["open", "processing", "resolved", "closed"]
 
+
+class IndexJobItem(BaseModel):
+    job_id: str
+    domain: str | None
+    status: Literal["queued", "running", "completed", "failed"]
+    progress: int
+    message: str
+    result: dict[str, Any] | None = None
+    created_at: str
+    updated_at: str

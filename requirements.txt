@@ -9,4 +9,8 @@ scikit-learn>=1.5,<2
 pypdf>=5,<7
 python-docx>=1.1,<2
 pytest>=8,<10
-
+rank-bm25>=0.2,<1
+faiss-cpu>=1.9,<2
+SQLAlchemy>=2,<3
+langgraph>=1,<2
+langgraph-checkpoint-sqlite>=3,<4

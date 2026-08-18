@@ -1,19 +1,23 @@
 services:
   - type: web
-    name: gamedev-copilot-rag-agent
+    name: incident-copilot-rag-agent
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
-    healthCheckPath: /api/health
+    healthCheckPath: /healthz
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.11
       - key: EMBEDDING_BACKEND
-        value: hybrid_tfidf
+        value: hashing
+      - key: VECTOR_BACKEND
+        value: faiss
+      - key: RERANKER_BACKEND
+        value: lightweight
       - key: RAG_STORAGE_DIR
-        value: /tmp/gamedev-copilot-storage
+        value: /tmp/incident-copilot-storage
       - key: LLM_API_KEY
         sync: false
       - key: LLM_BASE_URL

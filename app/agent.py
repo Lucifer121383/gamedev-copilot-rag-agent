@@ -30,6 +30,7 @@ class BugDiagnosisAgent:
         "提交bug",
         "提交 bug",
         "创建工单",
+        "创建故障工单",
         "提交工单",
         "转人工",
         "帮我登记",
@@ -87,14 +88,48 @@ class BugDiagnosisAgent:
         lowered = message.lower()
         if any(word in lowered for word in ("泄露", "被盗", "黑客", "未授权")):
             return "安全事件", "P1"
+
+        # Known database-pool failures stay service incidents even when the
+        # user asks what the error code means.
+        if "db-pool-503" in lowered:
+            return "服务故障", "P1"
+
+        # Separate knowledge/test questions from reports of active incidents.
+        # For example, "崩溃排查步骤是什么" is a P3 question, while "刚刚崩溃"
+        # remains a P1 incident.
+        knowledge_patterns = (
+            "代表什么",
+            "表示什么",
+            "标准排查步骤",
+            "如何避免",
+            "如何验证",
+            "怎样验证",
+            "为什么要",
+            "能不能",
+            "是否可以",
+            "哪条测试用例",
+            "预期结果",
+            "手续费是多少",
+            "公司年假",
+        )
+        history_lookup = "查询" in lowered and any(
+            word in lowered for word in ("根因", "修复方案", "处理方案")
+        )
+        if history_lookup or any(pattern in lowered for pattern in knowledge_patterns):
+            return "研发知识咨询", "P3"
+
         if any(word in lowered for word in ("崩溃", "闪退", "crash", "nullreference")):
             return "客户端崩溃" if domain == "game" else "服务故障", "P1"
+        if any(word in lowered for word in ("慢sql", "慢查询", "性能", "延迟", "掉帧", "慢")):
+            return "性能问题", "P2"
         if any(word in lowered for word in ("500", "不可用", "连接池", "宕机", "服务中断")):
             return "服务故障", "P1"
         if any(word in lowered for word in ("超时", "timeout", "卡死", "无法登录")):
             return "功能故障", "P2"
-        if any(word in lowered for word in ("性能", "延迟", "掉帧", "慢")):
-            return "性能问题", "P2"
+        if any(word in lowered for word in ("回调丢失", "失败", "无响应", "无法", "异常")):
+            return "功能故障", "P2"
+        if any(phrase in lowered for phrase in ("怎么修复", "如何修复")):
+            return "一般缺陷", "P2"
         if any(
             word in lowered
             for word in ("怎么", "为什么", "哪些", "什么内容", "说明", "规则", "设计", "发布风险")

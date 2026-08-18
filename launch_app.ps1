@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $projectDir = $PSScriptRoot
-$healthUrl = "http://127.0.0.1:8010/api/health"
+$healthUrl = "http://127.0.0.1:8010/healthz"
 $appUrl = "http://127.0.0.1:8010/"
 $logDir = Join-Path $projectDir "storage"
 $errorLog = Join-Path $logDir "launcher-error.log"
@@ -69,7 +69,7 @@ catch {
     Add-Type -AssemblyName System.Windows.Forms
     [System.Windows.Forms.MessageBox]::Show(
         $message,
-        "GameDev Copilot 启动失败",
+        "IncidentCopilot 启动失败",
         [System.Windows.Forms.MessageBoxButtons]::OK,
         [System.Windows.Forms.MessageBoxIcon]::Error
     ) | Out-Null

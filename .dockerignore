@@ -5,4 +5,6 @@ __pycache__
 .env
 storage
 data/uploads
-
+frontend/node_modules
+frontend/.vite
+*.db

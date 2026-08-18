@@ -6,7 +6,7 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from app.config import Settings
-from app.service import GameDevCopilotService
+from app.service import IncidentCopilotService
 
 
 CASES = [
@@ -18,16 +18,26 @@ CASES = [
 
 
 def main() -> None:
-    service = GameDevCopilotService(Settings())
-    service.load_or_ingest()
-    for index, (domain, message) in enumerate(CASES, start=1):
-        result = service.diagnose(
-            message=message, domain=domain, session_id=f"cli-demo-{index}"
-        )
-        print("=" * 70)
-        print(f"工作空间：{domain} | 问题：{message}")
-        print(result["answer"])
-        print("执行轨迹：", " -> ".join(item["node"] for item in result["trace"]))
+    service = IncidentCopilotService(Settings())
+    try:
+        service.load_or_ingest()
+        for index, (domain, message) in enumerate(CASES, start=1):
+            result = service.diagnose(
+                message=message, domain=domain, session_id=f"cli-demo-{index}"
+            )
+            if result["status"] == "awaiting_approval":
+                print("检测到写操作，演示脚本将显式批准创建演示工单。")
+                result = service.approve(
+                    result["request_id"],
+                    approved=True,
+                    reason="命令行演示显式批准",
+                )
+            print("=" * 70)
+            print(f"工作空间：{domain} | 问题：{message}")
+            print(result["answer"])
+            print("执行轨迹：", " -> ".join(item["node"] for item in result["trace"]))
+    finally:
+        service.close()
 
 
 if __name__ == "__main__":

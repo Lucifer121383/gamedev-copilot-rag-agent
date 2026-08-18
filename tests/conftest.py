@@ -15,12 +15,12 @@ def service(tmp_path: Path) -> GameDevCopilotService:
         project_root=PROJECT_ROOT,
         data_dir=PROJECT_ROOT / "data",
         storage_dir=tmp_path / "storage",
-        embedding_backend="hybrid_tfidf",
+        embedding_backend="hashing",
         llm_base_url="",
         llm_api_key="",
         llm_model="",
     )
     instance = GameDevCopilotService(settings)
     instance.ingest()
-    return instance
-
+    yield instance
+    instance.close()
